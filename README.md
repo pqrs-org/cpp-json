@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/pqrs-org/cpp-json.svg?branch=master)](https://travis-ci.com/pqrs-org/cpp-json)
+[![Build Status](https://github.com/pqrs-org/cpp-json/workflows/CI/badge.svg)](https://github.com/pqrs-org/cpp-json/actions)
 [![License](https://img.shields.io/badge/license-Boost%20Software%20License-blue.svg)](https://github.com/pqrs-org/cpp-json/blob/master/LICENSE.md)
 
 # cpp-json
