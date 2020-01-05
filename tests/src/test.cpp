@@ -50,6 +50,13 @@ TEST_CASE("find") {
   REQUIRE(pqrs::json::find_copy(json, "unknown", nlohmann::json("fallback_value")) == nlohmann::json("fallback_value"));
 }
 
+TEST_CASE("marshal_error") {
+  REQUIRE_THROWS_AS(throw pqrs::json::marshal_error("hello world"),
+                    pqrs::json::marshal_error);
+  REQUIRE_THROWS_WITH(throw pqrs::json::marshal_error("hello world"),
+                      "hello world");
+}
+
 TEST_CASE("unmarshal_error") {
   REQUIRE_THROWS_AS(throw pqrs::json::unmarshal_error("hello world"),
                     pqrs::json::unmarshal_error);
