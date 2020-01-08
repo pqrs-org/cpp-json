@@ -10,6 +10,7 @@ A utility for `nlohmann::json`.
 cpp-json depends the following classes.
 
 - [json](https://github.com/nlohmann/json)
+- [pqrs::string](https://github.com/pqrs-org/cpp-string)
 
 ## Install
 

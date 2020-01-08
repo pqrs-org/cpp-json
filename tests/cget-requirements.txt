@@ -1,2 +1,3 @@
 catchorg/Catch2
 nlohmann/json
+pqrs-org/cpp-string

@@ -63,3 +63,80 @@ TEST_CASE("unmarshal_error") {
   REQUIRE_THROWS_WITH(throw pqrs::json::unmarshal_error("hello world"),
                       "hello world");
 }
+
+TEST_CASE("requires_array") {
+  auto json = nlohmann::json::array();
+  pqrs::json::requires_array(json, "`json`");
+}
+
+TEST_CASE("requires_array throw") {
+  auto json = nlohmann::json::object({
+      {"key1", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
+      {"key2", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
+      {"key3", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
+      {"key4", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."},
+  });
+
+  REQUIRE_THROWS_AS(pqrs::json::requires_array(json, "`json`"),
+                    pqrs::json::unmarshal_error);
+  REQUIRE_THROWS_WITH(pqrs::json::requires_array(json, "`json`"),
+                      std::string("`json` must be array, but is `{") +
+                          "\"key1\":\"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\"," +
+                          "\"key2\":\"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore...`");
+}
+
+TEST_CASE("requires_boolean") {
+  nlohmann::json json = true;
+  pqrs::json::requires_boolean(json, "`json`");
+}
+
+TEST_CASE("requires_boolean throw") {
+  auto json = nlohmann::json::array();
+
+  REQUIRE_THROWS_AS(pqrs::json::requires_boolean(json, "`json`"),
+                    pqrs::json::unmarshal_error);
+  REQUIRE_THROWS_WITH(pqrs::json::requires_boolean(json, "`json`"),
+                      "`json` must be boolean, but is `[]`");
+}
+
+TEST_CASE("requires_number") {
+  nlohmann::json json = 123;
+  pqrs::json::requires_number(json, "`json`");
+}
+
+TEST_CASE("requires_number throw") {
+  auto json = nlohmann::json::array();
+
+  REQUIRE_THROWS_AS(pqrs::json::requires_number(json, "`json`"),
+                    pqrs::json::unmarshal_error);
+  REQUIRE_THROWS_WITH(pqrs::json::requires_number(json, "`json`"),
+                      "`json` must be number, but is `[]`");
+}
+
+TEST_CASE("requires_object") {
+  auto json = nlohmann::json::object();
+  pqrs::json::requires_object(json, "`json`");
+}
+
+TEST_CASE("requires_object throw") {
+  auto json = nlohmann::json::array();
+
+  REQUIRE_THROWS_AS(pqrs::json::requires_object(json, "`json`"),
+                    pqrs::json::unmarshal_error);
+  REQUIRE_THROWS_WITH(pqrs::json::requires_object(json, "`json`"),
+                      "`json` must be object, but is `[]`");
+}
+
+TEST_CASE("requires_string") {
+  nlohmann::json json = "example";
+  pqrs::json::requires_string(json, "`json`");
+}
+
+TEST_CASE("requires_string throw") {
+  auto json = nlohmann::json::array();
+
+  REQUIRE_THROWS_AS(pqrs::json::requires_string(json, "`json`"),
+                    pqrs::json::unmarshal_error);
+  REQUIRE_THROWS_WITH(pqrs::json::requires_string(json, "`json`"),
+                      "`json` must be string, but is `[]`");
+}
