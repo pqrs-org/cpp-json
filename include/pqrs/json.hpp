@@ -1,6 +1,6 @@
 #pragma once
 
-// pqrs::json v1.3
+// pqrs::json v1.4
 
 // (C) Copyright Takayama Fumihiko 2019.
 // Distributed under the Boost Software License, Version 1.0.
