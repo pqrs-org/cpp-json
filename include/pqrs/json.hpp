@@ -8,6 +8,7 @@
 
 #include "json/formatter.hpp"
 #include "json/marshal_error.hpp"
+#include "json/pqrs_formatter.hpp"
 #include "json/unmarshal_error.hpp"
 #include <nlohmann/json.hpp>
 #include <optional>

@@ -1,9 +1,12 @@
+#include "pqrs_formatter_test.hpp"
 #include <boost/ut.hpp>
 #include <pqrs/json.hpp>
 
 int main(void) {
   using namespace boost::ut;
   using namespace boost::ut::literals;
+
+  run_pqrs_formatter_test();
 
   "find"_test = [] {
     nlohmann::json json;
@@ -148,7 +151,7 @@ int main(void) {
       pqrs::json::requires_object(json, "`json`");
       expect(false);
     } catch (pqrs::json::unmarshal_error& ex) {
-            expect(std::string("`json` must be object, but is `[]`") == ex.what());
+      expect(std::string("`json` must be object, but is `[]`") == ex.what());
     } catch (...) {
       expect(false);
     }
