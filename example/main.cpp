@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <pqrs/json.hpp>
 
@@ -19,6 +20,9 @@ int main(void) {
   if (auto v = pqrs::json::find<std::string>(json, "string")) {
     std::cout << "string " << *v << std::endl;
   }
+
+  auto j = nlohmann::ordered_json::parse(std::ifstream("data/personal_tekezo_simple_vi_mode.json"));
+  std::cout << pqrs::json::pqrs_formatter::format(j, {.indent_size = 4}) << std::endl;
 
   return 0;
 }

@@ -6,7 +6,7 @@
 
 #include <nlohmann/json.hpp>
 #include <sstream>
-#include <stack>
+#include <unordered_set>
 
 namespace pqrs {
 namespace json {
@@ -24,6 +24,12 @@ namespace pqrs_formatter {
 //     "bool": true,
 //     "double": 123.456,
 //     "int": 42,
+//     "force_multi_line_array": [
+//         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+//         "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+//         "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+//         "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+//     ],
 //     "multi_line_array1": [
 //         [1, 2, 3, 4],
 //         [5, 6, 7, 8]
@@ -54,16 +60,26 @@ namespace pqrs_formatter {
 // }
 // ```
 
+struct options {
+  int indent_size;
+  std::unordered_set<std::string> force_multi_line_array_object_keys;
+};
+
 namespace impl {
 
-bool multi_line(const nlohmann::json& json) {
+template <typename T>
+bool multi_line(const T& json,
+                const options& options,
+                std::optional<std::string> parent_object_key) {
   if (json.is_object()) {
     if (json.size() == 0) {
       return false;
     }
 
     if (json.size() == 1) {
-      return multi_line(json.begin().value());
+      return multi_line(json.begin().value(),
+                        options,
+                        json.begin().key());
     }
 
     if (json.size() > 1) {
@@ -71,12 +87,20 @@ bool multi_line(const nlohmann::json& json) {
     }
 
   } else if (json.is_array()) {
+    if (auto key = parent_object_key) {
+      if (options.force_multi_line_array_object_keys.contains(*key)) {
+        return true;
+      }
+    }
+
     if (json.size() == 0) {
       return false;
     }
 
     if (json.size() == 1) {
-      return multi_line(json[0]);
+      return multi_line(json[0],
+                        options,
+                        std::nullopt);
     }
 
     for (const auto& j : json) {
@@ -90,19 +114,21 @@ bool multi_line(const nlohmann::json& json) {
 }
 
 void indent(std::ostringstream& ss,
-            int indent_size,
+            const options& options,
             int indent_level) {
-  for (int i = 0; i < indent_size * indent_level; ++i) {
+  for (int i = 0; i < options.indent_size * indent_level; ++i) {
     ss << ' ';
   }
 }
 
+template <typename T>
 void format(std::ostringstream& ss,
-            const nlohmann::json& json,
-            int indent_size,
+            const T& json,
+            const options& options,
+            std::optional<std::string> parent_object_key,
             int indent_level) {
   if (json.is_object()) {
-    if (!multi_line(json)) {
+    if (!multi_line(json, options, parent_object_key)) {
       //
       // Single-line object
       //
@@ -118,7 +144,8 @@ void format(std::ostringstream& ss,
 
         format(ss,
                json.begin().value(),
-               indent_size,
+               options,
+               json.begin().key(),
                indent_level + 1);
 
         ss << " }";
@@ -139,26 +166,27 @@ void format(std::ostringstream& ss,
         first = false;
 
         indent(ss,
-               indent_size,
+               options,
                indent_level + 1);
 
         ss << std::quoted(k) << ": ";
         format(ss,
                v,
-               indent_size,
+               options,
+               k,
                indent_level + 1);
       }
 
       ss << '\n';
 
       indent(ss,
-             indent_size,
+             options,
              indent_level);
 
       ss << '}';
     }
   } else if (json.is_array()) {
-    if (!multi_line(json)) {
+    if (!multi_line(json, options, parent_object_key)) {
       //
       // Single-line array
       //
@@ -174,7 +202,8 @@ void format(std::ostringstream& ss,
 
         format(ss,
                v,
-               indent_size,
+               options,
+               std::nullopt,
                indent_level + 1);
       }
 
@@ -195,19 +224,20 @@ void format(std::ostringstream& ss,
         first = false;
 
         indent(ss,
-               indent_size,
+               options,
                indent_level + 1);
 
         format(ss,
                v,
-               indent_size,
+               options,
+               std::nullopt,
                indent_level + 1);
       }
 
       ss << '\n';
 
       indent(ss,
-             indent_size,
+             options,
              indent_level);
 
       ss << ']';
@@ -219,10 +249,11 @@ void format(std::ostringstream& ss,
 
 } // namespace impl
 
-std::string format(const nlohmann::json& json,
-                   int indent_size = 4) {
+template <typename T>
+std::string format(const T& json,
+                   const options& options) {
   std::ostringstream ss;
-  impl::format(ss, json, indent_size, 0);
+  impl::format(ss, json, options, std::nullopt, 0);
   return ss.str();
 }
 
