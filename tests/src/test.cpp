@@ -1,6 +1,7 @@
-#include "pqrs_formatter_test.hpp"
 #include <boost/ut.hpp>
 #include <pqrs/json.hpp>
+
+void run_pqrs_formatter_test(void);
 
 int main(void) {
   using namespace boost::ut;

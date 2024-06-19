@@ -1,5 +1,3 @@
-#pragma once
-
 #include <boost/ut.hpp>
 #include <pqrs/json.hpp>
 
