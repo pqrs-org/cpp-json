@@ -76,18 +76,31 @@ void run_pqrs_formatter_test(void) {
     std::string json_string = R"(
 
 {
-    "one": 1,
-    "two": 2,
-    "three": 3
+  "one": 1,
+  "two": 2,
+  "three": 3
 }
 
 )";
 
     pqrs::string::trim(json_string);
     auto json = nlohmann::ordered_json::parse(json_string);
-    auto actual = pqrs::json::pqrs_formatter::format(json, {.indent_size = 4});
+    auto actual = pqrs::json::pqrs_formatter::format(json, {.indent_size = 2});
     expect(json_string == actual);
 
     expect(json == nlohmann::ordered_json::parse(actual));
+  };
+
+  "corrupted_string"_test = [] {
+    auto json = nlohmann::json::object();
+    json["string"] = "hello\xe6world";
+
+    expect(throws([json] {
+      pqrs::json::pqrs_formatter::format(json, {});
+    })) << "expected exception is not thrown";
+
+    std::string expected = R"({ "string": "helloworld" })";
+    auto actual = pqrs::json::pqrs_formatter::format(json, {.error_handler = nlohmann::json::error_handler_t::ignore});
+    expect(expected == actual);
   };
 }
