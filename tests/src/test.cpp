@@ -1,9 +1,9 @@
 #include <boost/ut.hpp>
 #include <pqrs/json.hpp>
 
-void run_pqrs_formatter_test(void);
+void run_pqrs_formatter_test();
 
-int main(void) {
+int main() {
   using namespace boost::ut;
   using namespace boost::ut::literals;
 
@@ -49,6 +49,10 @@ int main(void) {
     expect(pqrs::json::find_object(json, "object") != std::nullopt);
     expect(pqrs::json::find_object(json, "object")->value().dump() == json["object"].dump());
 
+    expect(pqrs::json::find_json(json, "number") != std::nullopt);
+    expect(pqrs::json::find_json(json, "number")->value() == nlohmann::json(123));
+    expect(pqrs::json::find_json(json, "dummy") == std::nullopt);
+
     expect(pqrs::json::find_copy(json, "number", nlohmann::json("fallback_value")) == nlohmann::json(123));
     expect(pqrs::json::find_copy(json, "string", nlohmann::json("fallback_value")) == nlohmann::json("abc"));
     expect(pqrs::json::find_copy(json, "array", nlohmann::json("fallback_value")) == json["array"]);
@@ -60,7 +64,7 @@ int main(void) {
     try {
       throw pqrs::json::marshal_error("hello world");
       expect(false);
-    } catch (pqrs::json::marshal_error& ex) {
+    } catch (const pqrs::json::marshal_error& ex) {
       expect(std::string("hello world") == ex.what());
     } catch (...) {
       expect(false);
@@ -71,7 +75,7 @@ int main(void) {
     try {
       throw pqrs::json::unmarshal_error("hello world");
       expect(false);
-    } catch (pqrs::json::unmarshal_error& ex) {
+    } catch (const pqrs::json::unmarshal_error& ex) {
       expect(std::string("hello world") == ex.what());
     } catch (...) {
       expect(false);
@@ -94,7 +98,7 @@ int main(void) {
     try {
       pqrs::json::requires_array(json, "`json`");
       expect(false);
-    } catch (pqrs::json::unmarshal_error& ex) {
+    } catch (const pqrs::json::unmarshal_error& ex) {
       expect(std::string("`json` must be array, but is `{") +
                  "\"key1\":\"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\"," +
                  "\"key2\":\"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore...`" ==
@@ -115,7 +119,7 @@ int main(void) {
     try {
       pqrs::json::requires_boolean(json, "`json`");
       expect(false);
-    } catch (pqrs::json::unmarshal_error& ex) {
+    } catch (const pqrs::json::unmarshal_error& ex) {
       expect(std::string("`json` must be boolean, but is `[]`") == ex.what());
     } catch (...) {
       expect(false);
@@ -133,7 +137,7 @@ int main(void) {
     try {
       pqrs::json::requires_number(json, "`json`");
       expect(false);
-    } catch (pqrs::json::unmarshal_error& ex) {
+    } catch (const pqrs::json::unmarshal_error& ex) {
       expect(std::string("`json` must be number, but is `[]`") == ex.what());
     } catch (...) {
       expect(false);
@@ -151,7 +155,7 @@ int main(void) {
     try {
       pqrs::json::requires_object(json, "`json`");
       expect(false);
-    } catch (pqrs::json::unmarshal_error& ex) {
+    } catch (const pqrs::json::unmarshal_error& ex) {
       expect(std::string("`json` must be object, but is `[]`") == ex.what());
     } catch (...) {
       expect(false);
@@ -169,7 +173,7 @@ int main(void) {
     try {
       pqrs::json::requires_string(json, "`json`");
       expect(false);
-    } catch (pqrs::json::unmarshal_error& ex) {
+    } catch (const pqrs::json::unmarshal_error& ex) {
       expect(std::string("`json` must be string, but is `[]`") == ex.what());
     } catch (...) {
       expect(false);

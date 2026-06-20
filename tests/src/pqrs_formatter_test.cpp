@@ -1,7 +1,7 @@
 #include <boost/ut.hpp>
 #include <pqrs/json.hpp>
 
-void run_pqrs_formatter_test(void) {
+void run_pqrs_formatter_test() {
   using namespace boost::ut;
   using namespace boost::ut::literals;
 
@@ -96,7 +96,8 @@ void run_pqrs_formatter_test(void) {
     json["string"] = "hello\xe6world";
 
     expect(throws([json] {
-      pqrs::json::pqrs_formatter::format(json, {});
+      auto actual = pqrs::json::pqrs_formatter::format(json, {});
+      expect(actual.empty());
     })) << "expected exception is not thrown";
 
     std::string expected = R"({ "string": "helloworld" })";

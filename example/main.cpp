@@ -2,7 +2,7 @@
 #include <iostream>
 #include <pqrs/json.hpp>
 
-int main(void) {
+int main() {
   nlohmann::json json;
   json["number"] = 123;
   json["string"] = "abc";
